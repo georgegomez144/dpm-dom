@@ -14,19 +14,17 @@ var D_ = (function (win) {
   var reg_hasIdSelector = /\#[a-z0-9\-\_]+$/i;
   var reg_hasClassSelector = /(?:\s)?\.[a-z0-9\-\_]+$/i;
   var reg_hasNodeSelector = /[a-z0-9\-\_]+$/i;
-  var reg_isNode = /^\<[a-z0-9\-\_]+\s/i;
+  var reg_isNode = /^\<([a-z0-9\-\_]+)\s/i;
   var reg_findId = /(?:\sid\=\"([a-z0-9\-\_]+)\")/i;
-  var reg_findClass = /(?:\sclass\=\"([a-z0-9\-\_]+)\")/i;
-  var reg_findAttrs = /(?:\s(?!class)(?!data\-)(?!id)([a-z0-9\-]+)\=\"([a-z0-9\-\_]+)\")/i
-  var reg_findDataset = /(?:\sdata\-([a-z0-9\-]+)\=\"([a-z0-9\-\_]+)\")/i
+  var reg_findClass = /(?:\sclass\=\"([a-z0-9\-\_\s]+)\")/i;
+  var reg_findAttrs = /(?:\s(?!class)(?!data\-)(?!id)([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/gi;
+  var reg_findDataset = /(?:\sdata\-([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/i;
 
   var __dom = function (selector) {
     return new DpmDOM(selector);
   };
 
-  /*
-   * Public API
-   * */
+  /* Public API */
   function DpmDOM(selector) {
     this.__selector = selector;
     switch (typeof this.__selector) {
@@ -66,17 +64,34 @@ var D_ = (function (win) {
           this[t].addEventListener('load', callback);
         }
       }
+    },
+    append: function(element) {
+      if(typeof element === 'string') element = createElement(element);
+      for(let t = 0; t < this.length; t++) {
+        this[t].appendChild(element);
+      }
+      return this;
     }
   };
 
-  /* 
-   *  Internal Functions
-   * */
+  /* Internal Functions */
   function createElement(element) {
-    var newElement, node, id, classes, attrs, datasets;
-    node = element.match(reg_isNode);
-    $log.log(node);
-
+    let newElement, id, classes, attrs, datasets;
+    newElement = document.createElement( element.match(reg_isNode)[1] );
+    if(id = element.match(reg_findId)) newElement.id = id[1];
+    if(classes = element.match(reg_findClass)) {
+      let classNames = classes[1].split(' ');
+      for(let i = 0; i < classNames.length; i++) {
+        newElement.classList.add(classNames[i]);
+      }
+    }
+    if(attrs = element.match(reg_findAttrs)) {
+      for(let i = 0; i < attrs.length; i++) {
+        const arrAttrs = attrs[i].trim().split('=');
+        newElement[arrAttrs[0]] = arrAttrs[1];
+      }
+    }
+    if(datasets = element.match(reg_findDataset)) newElement.dataset[datasets[1]] = datasets[2];
     return newElement;
   }
 
