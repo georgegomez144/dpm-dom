@@ -37,12 +37,12 @@ var D_ = (function (win) {
         } else {
           const prepSelectorArray = this.__selector.split(',');
           let elements = [];
-          for (i = 0; i < prepSelectorArray.length; i++) {
+          for (let i = 0; i < prepSelectorArray.length; i++) {
             const trimmedSelector = prepSelectorArray[i].trim();
             const querySelectorAll = document.querySelectorAll(trimmedSelector);
-            for (q = 0; q < querySelectorAll.length; q++) elements.push(querySelectorAll[q]);
+            for (let q = 0; q < querySelectorAll.length; q++) elements.push(querySelectorAll[q]);
           }
-          for (i = 0; i < elements.length; i++) this[i] = elements[i];
+          for (let i = 0; i < elements.length; i++) this[i] = elements[i];
           this.length = elements.length;
         }
         break;
@@ -55,7 +55,7 @@ var D_ = (function (win) {
   }
   DpmDOM.prototype = {
     ready: function (callback) {
-      for (t = 0; t < this.length; t++) {
+      for (let t = 0; t < this.length; t++) {
         if (this.__selector === document) {
           document.onreadystatechange = function () {
             if (document.readyState === 'complete') {
