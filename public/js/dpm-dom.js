@@ -35,11 +35,11 @@ var D_ = (function (win) {
           this[0] = createElement(this.__selector);
           this.length = 1;
         } else {
-          var prepSelectorArray = this.__selector.split(',');
-          var elements = [];
+          const prepSelectorArray = this.__selector.split(',');
+          let elements = [];
           for (i = 0; i < prepSelectorArray.length; i++) {
-            var trimmedSelector = prepSelectorArray[i].trim();
-            var querySelectorAll = document.querySelectorAll(trimmedSelector);
+            const trimmedSelector = prepSelectorArray[i].trim();
+            const querySelectorAll = document.querySelectorAll(trimmedSelector);
             for (q = 0; q < querySelectorAll.length; q++) elements.push(querySelectorAll[q]);
           }
           for (i = 0; i < elements.length; i++) this[i] = elements[i];

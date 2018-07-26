@@ -16,6 +16,7 @@ gulp.task('js', cb => {
         sourcemaps.init(),
         concat('dpm-dom.js'),
         gulp.dest('./public/js'),
+        babel({presets: 'babel-preset-env'}),
         uglify(),
         rename({suffix:'.min'}),
         sourcemaps.write('.'),
