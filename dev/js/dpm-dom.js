@@ -81,7 +81,23 @@ var D_ = (function (win) {
         this[t].parentNode.insertBefore(element, this[t]);
       }
       return this;
-    }
+    },
+    addClass: function(className) {
+      return this;
+    },
+    removeClass: function(className) {
+      if(!className) {
+        // remove all classes
+      } else {
+
+      }
+      return this;
+    },
+    prop: function(prop, value) {},
+    attr: function(attr, value) {},
+    removeAttr: function(attr) {},
+    data: function(data, value) {},
+    css: function(styles) {}
   };
 
   /* Internal Functions */
