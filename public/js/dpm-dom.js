@@ -5,10 +5,79 @@
   Date Created: 07/25/2018
 */
 
-var D_ = (function (win) {
+var D = (function (win, undefined) {
 
   // for internal debugging
   var $log = console;
+  // internal use of prototypes
+  NodeList.prototype.forEach = Array.prototype.forEach = function(callback, context) {
+    for ( let i = 0; i < this.length; i++ ) {
+      if(context) {
+        let bindContext = callback.bind(context);
+        bindContext(this[i], i);
+      } else {
+        let bindThis = callback.bind(this)
+        bindThis(this[i], i);
+      }
+    }
+    return (context) ? context : this;
+  };
+  Object.prototype.forEach = function(callback, context) {
+    const keys = Object.keys(this);
+    for ( let i in keys ) {
+      if(context) {
+        let bindContext = callback.bind(context);
+        bindContext(this[keys[i]], keys[i]);
+      } else {
+        let bindThis = callback.bind(this)
+        bindThis(this[keys[i]], keys[i]);
+      }
+    }
+    return (context) ? context : this;
+  };
+  NodeList.prototype.map = Array.prototype.map = function(callback, context) {
+    let newArray = [];
+    for ( let i = 0; i < this.length; i++ ) {
+      if(context) {
+        let bindContext = callback.bind(context);
+        bindContext(this[i], i);
+      } else {
+        let bindThis = callback.bind(this)
+        bindThis(this[i], i);
+      }
+      newArray[i] = this[i];
+    }
+    return newArray;
+  };
+  Object.prototype.map = function(callback, context) {
+    let newObject = {};
+    const keys = Object.keys(this);
+    for ( let i in keys ) {
+      if(context) {
+        let bindContext = callback.bind(context);
+        bindContext(this[keys[i]], keys[i]);
+      } else {
+        let bindThis = callback.bind(this)
+        bindThis(this[keys[i]], keys[i]);
+      }
+      newObject[keys[i]] = this[keys[i]];
+    }
+    return newObject;
+  };
+
+  const array1 = ['name','email','address'];
+  const array2 = ['other','newname'];
+  const object1 = {name:'george',email:'george144k.dev@gmail.com',number:'800-987-1523'};
+
+  object1.forEach(function(v,i) {
+    v = i + ' ' + v;
+  });
+  console.log(object1);
+
+  let newArray = array1.map(function(v,i) {
+    v = v + ' addition';
+  });
+  console.log(newArray);
 
   // RegExp
   var reg_hasIdSelector = /\#[a-z0-9\-\_]+$/i;
@@ -68,6 +137,10 @@ var D_ = (function (win) {
         }
       }
     },
+    forEach: function(callback) {
+      for ( t = 0; t < this.length; t++ ) callback(this[t], t);
+      return this;
+    },
     append: function(element) {
       if(typeof element === 'string') element = createElement(element);
       for(t = 0; t < this.length; t++) {
@@ -83,6 +156,8 @@ var D_ = (function (win) {
       return this;
     },
     addClass: function(className) {
+      var classNames = className.split(' ');
+
       return this;
     },
     removeClass: function(className) {
