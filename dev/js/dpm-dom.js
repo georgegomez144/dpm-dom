@@ -51,9 +51,12 @@ var D_ = (function (win) {
     }
     return this;
   }
+
+  let t;
+
   DpmDOM.prototype = {
     ready: function (callback) {
-      for (let t = 0; t < this.length; t++) {
+      for (t = 0; t < this.length; t++) {
         if (this.__selector === document) {
           document.onreadystatechange = function () {
             if (document.readyState === 'complete') {
@@ -67,8 +70,15 @@ var D_ = (function (win) {
     },
     append: function(element) {
       if(typeof element === 'string') element = createElement(element);
-      for(let t = 0; t < this.length; t++) {
+      for(t = 0; t < this.length; t++) {
         this[t].appendChild(element);
+      }
+      return this;
+    },
+    prepend: function(element) {
+      for(t=0;t<this.length;t++) {
+        if(typeof element === 'string') element = createElement(element);
+        this[t].parentNode.insertBefore(element, this[t]);
       }
       return this;
     }
