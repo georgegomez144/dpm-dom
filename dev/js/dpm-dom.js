@@ -5,10 +5,10 @@
   Date Created: 07/25/2018
 */
 
-var D = (function (win, undefined) {
+const D = (function (win, undefined) {
 
   // for internal debugging
-  var $log = console;
+  const $log = console;
   // internal use of prototypes
   NodeList.prototype.forEach = Array.prototype.forEach = function(callback, context) {
     for ( let i = 0; i < this.length; i++ ) {
@@ -80,16 +80,16 @@ var D = (function (win, undefined) {
   console.log(newArray);
 
   // RegExp
-  var reg_hasIdSelector = /\#[a-z0-9\-\_]+$/i;
-  var reg_hasClassSelector = /(?:\s)?\.[a-z0-9\-\_]+$/i;
-  var reg_hasNodeSelector = /[a-z0-9\-\_]+$/i;
-  var reg_isNode = /^\<([a-z0-9\-\_]+)\s/i;
-  var reg_findId = /(?:\sid\=\"([a-z0-9\-\_]+)\")/i;
-  var reg_findClass = /(?:\sclass\=\"([a-z0-9\-\_\s]+)\")/i;
-  var reg_findAttrs = /(?:\s(?!class)(?!data\-)(?!id)([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/gi;
-  var reg_findDataset = /(?:\sdata\-([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/i;
+  const reg_hasIdSelector = /\#[a-z0-9\-\_]+$/i;
+  const reg_hasClassSelector = /(?:\s)?\.[a-z0-9\-\_]+$/i;
+  const reg_hasNodeSelector = /[a-z0-9\-\_]+$/i;
+  const reg_isNode = /^\<([a-z0-9\-\_]+)\s/i;
+  const reg_findId = /(?:\sid\=\"([a-z0-9\-\_]+)\")/i;
+  const reg_findClass = /(?:\sclass\=\"([a-z0-9\-\_\s]+)\")/i;
+  const reg_findAttrs = /(?:\s(?!class)(?!data\-)(?!id)([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/gi;
+  const reg_findDataset = /(?:\sdata\-([a-z0-9\-]+)\=\"([a-z0-9\-\_\s]+)\")/i;
 
-  var __dom = function (selector) {
+  const __dom = function (selector) {
     return new DpmDOM(selector);
   };
 
@@ -177,23 +177,9 @@ var D = (function (win, undefined) {
 
   /* Internal Functions */
   function createElement(element) {
-    let newElement, id, classes, attrs, datasets;
-    newElement = document.createElement( element.match(reg_isNode)[1] );
-    if(id = element.match(reg_findId)) newElement.id = id[1];
-    if(classes = element.match(reg_findClass)) {
-      let classNames = classes[1].split(' ');
-      for(let i = 0; i < classNames.length; i++) {
-        newElement.classList.add(classNames[i]);
-      }
-    }
-    if(attrs = element.match(reg_findAttrs)) {
-      for(let i = 0; i < attrs.length; i++) {
-        const arrAttrs = attrs[i].trim().split('=');
-        newElement[arrAttrs[0]] = arrAttrs[1];
-      }
-    }
-    if(datasets = element.match(reg_findDataset)) newElement.dataset[datasets[1]] = datasets[2];
-    return newElement;
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = element;
+    return wrapper.childNodes[0];
   }
 
   return (__dom);
