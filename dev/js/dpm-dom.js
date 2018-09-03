@@ -9,75 +9,58 @@ const D = (function (win, undefined) {
 
   // for internal debugging
   const $log = console;
+
   // internal use of prototypes
-  NodeList.prototype.forEach = Array.prototype.forEach = function(callback, context) {
-    for ( let i = 0; i < this.length; i++ ) {
-      if(context) {
-        let bindContext = callback.bind(context);
-        bindContext(this[i], i);
-      } else {
-        let bindThis = callback.bind(this)
-        bindThis(this[i], i);
+  if (!Array.prototype.forEach) {
+    Array.prototype.forEach = function(callback/*, thisArg*/) {
+      var T, k;
+      if (this == null) throw new TypeError('this is null or not defined');
+      var O = Object(this);
+      var len = O.length >>> 0;
+      if (typeof callback !== 'function') throw new TypeError(callback + ' is not a function');
+      if (arguments.length > 1) T = arguments[1];
+      k = 0;
+      while (k < len) {
+        var kValue;
+        if (k in O) {
+          kValue = O[k];
+          callback.call(T, kValue, k, O);
+        }
+        k++;
       }
-    }
-    return (context) ? context : this;
-  };
-  Object.prototype.forEach = function(callback, context) {
-    const keys = Object.keys(this);
-    for ( let i in keys ) {
-      if(context) {
-        let bindContext = callback.bind(context);
-        bindContext(this[keys[i]], keys[i]);
-      } else {
-        let bindThis = callback.bind(this)
-        bindThis(this[keys[i]], keys[i]);
-      }
-    }
-    return (context) ? context : this;
-  };
-  NodeList.prototype.map = Array.prototype.map = function(callback, context) {
-    let newArray = [];
-    for ( let i = 0; i < this.length; i++ ) {
-      if(context) {
-        let bindContext = callback.bind(context);
-        bindContext(this[i], i);
-      } else {
-        let bindThis = callback.bind(this)
-        bindThis(this[i], i);
-      }
-      newArray[i] = this[i];
-    }
-    return newArray;
-  };
-  Object.prototype.map = function(callback, context) {
-    let newObject = {};
-    const keys = Object.keys(this);
-    for ( let i in keys ) {
-      if(context) {
-        let bindContext = callback.bind(context);
-        bindContext(this[keys[i]], keys[i]);
-      } else {
-        let bindThis = callback.bind(this)
-        bindThis(this[keys[i]], keys[i]);
-      }
-      newObject[keys[i]] = this[keys[i]];
-    }
-    return newObject;
-  };
+    };
+  }
+  if (!NodeList.prototype.forEach) NodeList.prototype.forEach = Array.prototype.forEach;
 
-  const array1 = ['name','email','address'];
-  const array2 = ['other','newname'];
-  const object1 = {name:'george',email:'george144k.dev@gmail.com',number:'800-987-1523'};
-
-  object1.forEach(function(v,i) {
-    v = i + ' ' + v;
-  });
-  console.log(object1);
-
-  let newArray = array1.map(function(v,i) {
-    v = v + ' addition';
-  });
-  console.log(newArray);
+  if (!Array.prototype.map) {
+    Array.prototype.map = function(callback/*, thisArg*/) {
+      var T, A, k;
+      if (this == null) {
+        throw new TypeError('this is null or not defined');
+      }
+      var O = Object(this);
+      var len = O.length >>> 0;
+      if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+      }
+      if (arguments.length > 1) {
+        T = arguments[1];
+      }
+      A = new Array(len);
+      k = 0;
+      while (k < len) {
+        var kValue, mappedValue;
+        if (k in O) {
+          kValue = O[k];
+          mappedValue = callback.call(T, kValue, k, O);
+          A[k] = mappedValue;
+        }
+        k++;
+      }
+      return A;
+    };
+  }
+  if (!NodeList.prototype.map) NodeList.prototype.map = Array.prototype.map;
 
   // RegExp
   const reg_hasIdSelector = /\#[a-z0-9\-\_]+$/i;
@@ -137,10 +120,8 @@ const D = (function (win, undefined) {
         }
       }
     },
-    forEach: function(callback) {
-      for ( t = 0; t < this.length; t++ ) callback(this[t], t);
-      return this;
-    },
+    forEach: Array.prototype.forEach,
+    map: Array.prototype.map,
     append: function(element) {
       if(typeof element === 'string') element = createElement(element);
       for(t = 0; t < this.length; t++) {
@@ -155,24 +136,98 @@ const D = (function (win, undefined) {
       }
       return this;
     },
-    addClass: function(className) {
-      var classNames = className.split(' ');
-
-      return this;
-    },
-    removeClass: function(className) {
-      if(!className) {
-        // remove all classes
-      } else {
-
+    addClass: function(classNames) {
+      var classNames = classNames.split(' ');
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        classNames.forEach(function(className) {
+          $this.classList.add(className)
+        })
       }
       return this;
     },
-    prop: function(prop, value) {},
-    attr: function(attr, value) {},
-    removeAttr: function(attr) {},
-    data: function(data, value) {},
-    css: function(styles) {}
+    removeClass: function(classNames) {
+      var classNames = classNames ? classNames.split(' ') : classNames;
+      console.log('classNames', classNames);
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        if(classNames == undefined || classNames.length == 0) {
+          $this.className = ''
+        } else {
+          classNames.forEach(function(className) {
+            $this.classList.remove(className)
+          })
+        }
+      }
+      return this;
+    },
+    prop: function(prop, value) {
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        if( value !== undefined ) {
+          $this[prop] = value
+        } else {
+          return $this[prop]
+        }
+      }
+      return this;
+    },
+    removeProp: function(prop) {
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        delete $this[prop]
+      }
+      return this;
+    },
+    attr: function(attr, value) {
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        if( value !== undefined ) {
+          $this.setAttribute(attr,value)
+        } else {
+          return $this.getAttribute(attr)
+        }
+      }
+      return this;
+    },
+    removeAttr: function(attr) {
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        $this.removeAttribute(attr)
+      }
+      return this;
+    },
+    data: function(data, value) {
+      for(t=0;t<this.length;t++) {
+        if(!value) {
+          return this.dataset[data]
+        } else {
+          this.dataset[data] = value
+        }
+      }
+      return this;
+    },
+    css: function() {
+      var args = arguments;
+      for(t=0;t<this.length;t++) {
+        var $this = this[t]
+        if(args[0]) {
+          if(typeof args[0] === 'object') {
+            for(let i in args[0]) {
+              $this.style[i] = args[0][i]
+            }
+          }
+          if(typeof args[0] === 'string') {
+            if(!args[1]) {
+              return $this.style[args[0]]
+            } else {
+              $this.style[args[0]] = args[1]
+            }
+          }
+        }
+      }
+      return this;
+    }
   };
 
   /* Internal Functions */
